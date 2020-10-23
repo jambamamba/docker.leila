@@ -3,6 +3,12 @@ Docker container based on tensorflow/tensorflow:latest-gpu-jupyter.
 Comes with TensorFlow pre-installed.
 Requires NVIDIA GPU on host machine.
 
+To confirm if your PC has a GPU
+```bash
+lspci | grep VGA
+```
+It should read something like this "NVIDIA Corporation GP104 [GeForce GTX 1080] (rev a1)"
+
 ## Get the files, build the Docker image, then enter it:
 ```bash
 git clone https://github.com/jambamamba/leila.docker.git
