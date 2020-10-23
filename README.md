@@ -15,6 +15,11 @@ docker pull tensorflow/tensorflow:latest-gpu-jupyter
 ```
 then follow with the builddocker.sh script above
 
+If it asks for password when you run enterdocker.sh script, the password is:
+```bash
+dev
+```
+
 
 ## Just building the Docker container
 ```bash
