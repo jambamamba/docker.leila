@@ -5,7 +5,8 @@ Requires NVIDIA GPU on host machine.
 
 ## Get the files, build the Docker image, then enter it:
 ```bash
-git clone https://github.com/jambamamba/leila.docker.gitcd leila.docker
+git clone https://github.com/jambamamba/leila.docker.git
+cd leila.docker
 ./builddocker.sh
 ./enterdocker.sh
 ```
