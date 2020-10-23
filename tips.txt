@@ -1,0 +1,8 @@
+https://hub.docker.com/layers/tensorflow/tensorflow/2.3.1-gpu-jupyter/images/sha256-468fb94335d7ec3394ef33e504a45f6556df6f72110c093d4fdda1f26f604af2?context=explore
+..
+
+https://www.tensorflow.org/install/docker
+
+docker pull tensorflow/tensorflow:latest-gpu-jupyter
+docker run -it tensorflow/tensorflow:latest-gpu-jupyter /bin/bash
+
