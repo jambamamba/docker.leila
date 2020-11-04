@@ -49,11 +49,11 @@ function configureSelfSignedCertificate()
 	pushd /home/dev/.certs/
 	if [[ ! -f "self-signed.crt" || ! -f "self-signed.key" ]]; then
 		openssl req -new -x509 -days 365 -sha1 -newkey rsa:1024 -nodes -keyout server.key -out server.crt -subj '/O=Company/OU=Department/CN=osletek.com'
-		cp server.crt /home/dev/.ssh/self-signed.crt
-		cp server.key /home/dev/.ssh/self-signed.key
+		sudo cp server.crt /home/dev/.ssh/self-signed.crt
+		sudo cp server.key /home/dev/.ssh/self-signed.key
 	else
-		cp self-signed.crt /home/dev/.ssh/self-signed.crt
-		cp self-signed.key /home/dev/.ssh/self-signed.key
+		sudo cp self-signed.crt /home/dev/.ssh/self-signed.crt
+		sudo cp self-signed.key /home/dev/.ssh/self-signed.key
 	fi
 	popd
 }
