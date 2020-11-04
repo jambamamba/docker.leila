@@ -35,35 +35,33 @@ function configureUserDirectory()
     sudo cp -nr /home/dev/$1/* /home/dev/$DOCKERUSER/$1/ && true
     rm -fr /home/dev/$1 
     ln -s /home/dev/$DOCKERUSER/$1 /home/dev/$1 && true
-	sudo chown -R dev:dev /home/dev/$DOCKERUSER/$1
 }
 function configureLibsDirectory()
 {	
-	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
-	sudo mkdir -p $LIBS_DIR
-	sudo chown -R dev:dev $LIBS_DIR
-	mv /tmp/.libs /home/dev
+    sudo chown -R dev:dev /tmp/.libs
+    sudo cp -r /tmp/.libs /home/dev/$DOCKERUSER/
 }
 
 function configureScriptsDirectory()
 {
-	sudo mv /tmp/.scripts /home/dev
-	sudo chown -R dev:dev /home/dev/.scripts
+    sudo chown -R dev:dev /tmp/.scripts
+    sudo mv -f /tmp/.scripts /home/dev/
 }
 
 function configureSelfSignedCertificate()
 {
-	sudo cp -r /tmp/.certs /home/dev
-	pushd /home/dev/.certs/
-	if [[ ! -f "self-signed.crt" || ! -f "self-signed.key" ]]; then
-		openssl req -new -x509 -days 365 -sha1 -newkey rsa:1024 -nodes -keyout server.key -out server.crt -subj '/O=Company/OU=Department/CN=osletek.com'
-		sudo cp server.crt /home/dev/.ssh/self-signed.crt
-		sudo cp server.key /home/dev/.ssh/self-signed.key
-	else
-		sudo cp self-signed.crt /home/dev/.ssh/self-signed.crt
-		sudo cp self-signed.key /home/dev/.ssh/self-signed.key
-	fi
-	popd
+    sudo chown -R dev:dev /tmp/.certs
+    mv -f /tmp/.certs /home/dev
+    pushd /home/dev/.certs/
+    if [[ ! -f "self-signed.crt" || ! -f "self-signed.key" ]]; then
+        openssl req -new -x509 -days 365 -sha1 -newkey rsa:1024 -nodes -keyout server.key -out server.crt -subj '/O=Company/OU=Department/CN=osletek.com'
+        sudo cp server.crt /home/dev/.ssh/self-signed.crt
+        sudo cp server.key /home/dev/.ssh/self-signed.key
+    else
+        sudo cp self-signed.crt /home/dev/.ssh/self-signed.crt
+        sudo cp self-signed.key /home/dev/.ssh/self-signed.key
+    fi
+    popd
 }
 
 function configureMysql()
@@ -133,7 +131,7 @@ function installXiphLibrary()
 	./autogen.sh
 	./configure --enable-shared
 	make -j$(getconf _NPROCESSORS_ONLN)
-	make install
+	sudo make install
 	popd
 }
 
@@ -143,7 +141,7 @@ function installMp3Lame()
 	pushd lame-svn
 	./configure --enable-shared --enable-nasm
 	make -j$(getconf _NPROCESSORS_ONLN)
-	make install
+	sudo make install
 	popd
 }
 
@@ -153,7 +151,7 @@ function installVpx()
 	pushd libvpx
 	CFLAGS="-fPIC" ./configure --enable-vp8 --enable-vp9 --enable-webm-io --enable-shared
 	make -j$(getconf _NPROCESSORS_ONLN)
-	make install
+	sudo make install
 	popd
 }
 
@@ -163,7 +161,7 @@ function installX264()
 	pushd x264
 	./configure --enable-shared --disable-asm
 	make -j$(getconf _NPROCESSORS_ONLN)
-	make install
+	sudo make install
 	popd	 
 }
 
@@ -227,6 +225,25 @@ function installFFMpeg()
 	configureFFMpegScript
 }
 
+function installCMake()
+{
+	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
+	if [ -d "$LIBS_DIR/CMake" ]; then
+		return;
+	fi
+	
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	git clone https://github.com/Kitware/CMake.git
+	
+	pushd CMake
+	./configure
+	make -j$(getconf _NPROCESSORS_ONLN)
+	sudo make install
+	popd
+}
+
+
 function installOpenCV()
 {
 	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
@@ -244,7 +261,7 @@ function installOpenCV()
 	pushd build
 	cmake ../
 	make -j$(getconf _NPROCESSORS_ONLN)
-	make install
+	sudo make install
 	popd
 }
 
@@ -269,22 +286,6 @@ function installKeras()
 	pip3 show keras
 }
 
-function configureCMake()
-{
-	DOWNLOADS_DIR="/home/dev/$DOCKERUSER/Downloads"
-	CMAKE_VERSION="3.19.0-rc2"
-	if [ -d "$DOWNLOADS_DIR/cmake-$CMAKE_VERSION" ]; then
-		export PATH=$PATH:$DOWNLOADS_DIR/cmake-$CMAKE_VERSION/bin
-		return;
-	fi
-	pushd "$DOWNLOADS_DIR"
-	wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.tar.gz
-	tar -xzvf cmake-$CMAKE_VERSION.tar.gz
-	popd
-
-	export PATH=$PATH:$DOWNLOADS_DIR/cmake-$CMAKE_VERSION/bin
-}
-
 #####################################################################################
 function main()
 {
@@ -301,7 +302,7 @@ function main()
 	configureApache2
 	configureQtCreator
 	configureOpenGl
-	configureCMake
+	installCMake
 	installFFMpeg
 	installOpenCV
 	installKeras
