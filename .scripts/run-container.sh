@@ -36,6 +36,12 @@ function configureUserDirectory()
     rm -fr /home/dev/$1 
     ln -s /home/dev/$DOCKERUSER/$1 /home/dev/$1 && true
 	sudo chown -R dev:dev /home/dev/$DOCKERUSER/$1
+	
+	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
+	if [ -d "$LIBS_DIR" ]; then
+		sudo mkdir -p $LIBS_DIR
+	fi
+	sudo chown -R dev:dev "$LIBS_DIR"
 }
 
 function configureScriptsDirectory()
