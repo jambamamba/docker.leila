@@ -38,9 +38,7 @@ function configureUserDirectory()
 	sudo chown -R dev:dev /home/dev/$DOCKERUSER/$1
 	
 	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
-	if [ -d "$LIBS_DIR" ]; then
-		sudo mkdir -p $LIBS_DIR
-	fi
+	sudo mkdir -p $LIBS_DIR
 	sudo chown -R dev:dev "$LIBS_DIR"
 }
 
