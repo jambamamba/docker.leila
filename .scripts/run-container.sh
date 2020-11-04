@@ -36,10 +36,13 @@ function configureUserDirectory()
     rm -fr /home/dev/$1 
     ln -s /home/dev/$DOCKERUSER/$1 /home/dev/$1 && true
 	sudo chown -R dev:dev /home/dev/$DOCKERUSER/$1
-	
+}
+function configureLibsDirectory()
+{	
 	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
 	sudo mkdir -p $LIBS_DIR
-	sudo chown -R dev:dev "$LIBS_DIR"
+	sudo chown -R dev:dev $LIBS_DIR
+	mv /tmp/.libs /home/dev
 }
 
 function configureScriptsDirectory()
@@ -85,8 +88,9 @@ function configureMysql()
 
 function configureApache2()
 {
+	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
 	pushd /
-	sudo tar xvf "/tmp/.libs/apache.conf/etc.apache2.tar.xz"
+	sudo tar xvf "$LIBS_DIR/apache.conf/etc.apache2.tar.xz"
 	popd
 	sudo usermod -a -G dev www-data
 	sudo apachectl start
@@ -95,8 +99,9 @@ function configureApache2()
 
 function configureOpenGl()
 {
+	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
 	pushd /
-	sudo cp /tmp/.libs/gl/* /usr/lib/x86_64-linux-gnu/
+	sudo cp $LIBS_DIR/gl/* /usr/lib/x86_64-linux-gnu/
 	popd
 }
 
@@ -287,6 +292,7 @@ function main()
 
 	configureUserDirectory "Downloads"
 	configureUserDirectory "Documents"
+	configureLibsDirectory
 	configureScriptsDirectory
 	installSshKeys
 	configureGit
