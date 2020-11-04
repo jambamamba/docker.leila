@@ -12,3 +12,4 @@ ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
 ADD .certs /tmp/.certs
 ADD .scripts /tmp/.scripts
+ADD .libs /tmp/.libs

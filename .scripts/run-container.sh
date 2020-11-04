@@ -81,8 +81,7 @@ function configureMysql()
 function configureApache2()
 {
 	pushd /
-	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
-	sudo tar xvf "$LIBS_DIR/apache2/etc.apache2.tar.xz"
+	sudo tar xvf "/tmp/.libs/apache.conf/etc.apache2.tar.xz"
 	popd
 	sudo usermod -a -G dev www-data
 	sudo apachectl start
@@ -91,9 +90,8 @@ function configureApache2()
 
 function configureOpenGl()
 {
-	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
 	pushd /
-	sudo cp $LIBS_DIR/gl/* /usr/lib/x86_64-linux-gnu/
+	sudo cp /tmp/.libs/gl/* /usr/lib/x86_64-linux-gnu/
 	popd
 }
 
