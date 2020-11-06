@@ -37,7 +37,6 @@ function configureUserDirectory()
     sudo cp -nr /home/dev/$1/* /home/dev/$DOCKERUSER/$1/ && true
     rm -fr /home/dev/$1 
     ln -s /home/dev/$DOCKERUSER/$1 /home/dev/$1 && true
-	sudo chown -R dev:dev /home/dev/$DOCKERUSER/$1
 }
 
 function configureMysql()
