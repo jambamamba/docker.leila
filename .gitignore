@@ -1,0 +1,11 @@
+.libs/cmake*
+.libs/ffmpeg
+.libs/keras
+.libs/libvpx
+.libs/mp3lame
+.libs/ogg
+.libs/opencv
+.libs/theora
+.libs/vorbis
+.libs/x264
+
