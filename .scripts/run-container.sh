@@ -2,6 +2,8 @@
 #
 #
 set -exv
+#Docker Enable Guid Apps to run
+#xhost +
 
 function installSshKeys()
 {
@@ -37,34 +39,6 @@ function configureUserDirectory()
     ln -s /home/dev/$DOCKERUSER/$1 /home/dev/$1 && true
 	sudo chown -R dev:dev /home/dev/$DOCKERUSER/$1
 }
-function configureLibsDirectory()
-{	
-	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
-	sudo mkdir -p $LIBS_DIR
-	sudo chown -R dev:dev $LIBS_DIR
-	mv /tmp/.libs /home/dev
-}
-
-function configureScriptsDirectory()
-{
-	sudo mv /tmp/.scripts /home/dev
-	sudo chown -R dev:dev /home/dev/.scripts
-}
-
-function configureSelfSignedCertificate()
-{
-	sudo cp -r /tmp/.certs /home/dev
-	pushd /home/dev/.certs/
-	if [[ ! -f "self-signed.crt" || ! -f "self-signed.key" ]]; then
-		openssl req -new -x509 -days 365 -sha1 -newkey rsa:1024 -nodes -keyout server.key -out server.crt -subj '/O=Company/OU=Department/CN=osletek.com'
-		sudo cp server.crt /home/dev/.ssh/self-signed.crt
-		sudo cp server.key /home/dev/.ssh/self-signed.key
-	else
-		sudo cp self-signed.crt /home/dev/.ssh/self-signed.crt
-		sudo cp self-signed.key /home/dev/.ssh/self-signed.key
-	fi
-	popd
-}
 
 function configureMysql()
 {
@@ -88,34 +62,13 @@ function configureMysql()
 
 function configureApache2()
 {
-	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
+	LIBS_DIR="/home/dev/.libs"
 	pushd /
 	sudo tar xvf "$LIBS_DIR/apache.conf/etc.apache2.tar.xz"
 	popd
 	sudo usermod -a -G dev www-data
 	sudo apachectl start
 	#sudo tail -F /var/log/apache2/error.log
-}
-
-function configureOpenGl()
-{
-	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
-	pushd /
-	sudo cp $LIBS_DIR/gl/* /usr/lib/x86_64-linux-gnu/
-	popd
-}
-
-function installGoogleChromeBrowser()
-{
-	pushd /tmp
-	if [ ! -f "/tmp/google-chrome-stable_current_amd64.deb" ]; then 
-		wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-	fi
-
-	sudo apt --fix-broken install
-	sudo dpkg -i /tmp/google-chrome-stable_current_amd64.deb
-	sudo rm -f /tmp/google-chrome-stable_current_amd64.deb
-	popd
 }
 
 function configureQtCreator()
@@ -126,60 +79,9 @@ function configureQtCreator()
 	sudo ln -s /home/dev/$DOCKERUSER/.config /home/dev/.config
 }
 
-function installXiphLibrary()
-{
-	git clone https://github.com/xiph/$1.git
-	pushd $1
-	./autogen.sh
-	./configure --enable-shared
-	make -j$(getconf _NPROCESSORS_ONLN)
-	make install
-	popd
-}
-
-function installMp3Lame()
-{
-	svn checkout https://svn.code.sf.net/p/lame/svn/trunk/lame lame-svn
-	pushd lame-svn
-	./configure --enable-shared --enable-nasm
-	make -j$(getconf _NPROCESSORS_ONLN)
-	make install
-	popd
-}
-
-function installVpx()
-{
-	git clone https://chromium.googlesource.com/webm/libvpx
-	pushd libvpx
-	CFLAGS="-fPIC" ./configure --enable-vp8 --enable-vp9 --enable-webm-io --enable-shared
-	make -j$(getconf _NPROCESSORS_ONLN)
-	make install
-	popd
-}
-
-function installX264()
-{
-	git clone https://code.videolan.org/videolan/x264.git
-	pushd x264
-	./configure --enable-shared --disable-asm
-	make -j$(getconf _NPROCESSORS_ONLN)
-	make install
-	popd	 
-}
-
-function installFFMpegDependencies()
-{
-	installMp3Lame
-	installXiphLibrary ogg
-	installXiphLibrary vorbis
-	installXiphLibrary theora
-	installVpx
-	installX264
-}
-
 function configureFFMpegScript()
 {
-	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
+	LIBS_DIR="/home/dev/.libs"
 	echo "$LIBS_DIR/ffmpeg
 $LIBS_DIR/ffmpeg/libavdevice
 $LIBS_DIR/ffmpeg/libavfilter
@@ -197,78 +99,11 @@ $LIBS_DIR/x264
 
 	SCRIPTS_DIR="/home/dev/.scripts"
 	pushd /
-	sudo cp $SCRIPTS_DIR/ff.sh $LIBS_DIR/ffmpeg/
+	ln -s $SCRIPTS_DIR/ff.sh $LIBS_DIR/ffmpeg/ff.sh
 	popd
 
-	export PATH=$PATH:$LIBS_DIR/ffmpeg
+	export PATH=$PATH:$SCRIPTS_DIR/ffmpeg
 }
-
-function installFFMpeg()
-{
-	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
-	if [ -d "$LIBS_DIR/ffmpeg" ]; then
-		configureFFMpegScript
-		return;
-	fi
-	
-	mkdir -p $LIBS_DIR
-	pushd $LIBS_DIR
-	
-	installFFMpegDependencies
-	
-	git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg
-	pushd ffmpeg
-	./configure --enable-shared --arch=x86 --enable-libvpx --enable-libtheora --disable-encoder=vorbis --enable-libvorbis --enable-libmp3lame --enable-libx264 --enable-gpl
-	make -j$(getconf _NPROCESSORS_ONLN)
-	popd
-
-	popd
-
-	configureFFMpegScript
-}
-
-function installOpenCV()
-{
-	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
-	if [ -d "$LIBS_DIR/opencv/build" ]; then
-		return;
-	fi
-	
-	mkdir -p $LIBS_DIR
-	pushd $LIBS_DIR
-	if [ ! -d "$LIBS_DIR/opencv" ]; then
-		git clone  https://github.com/opencv/opencv.git
-	fi
-	pushd opencv
-	mkdir -p build
-	pushd build
-	cmake ../
-	make -j$(getconf _NPROCESSORS_ONLN)
-	make install
-	popd
-}
-
-function installKeras()
-{
-	LIBS_DIR="/home/dev/$DOCKERUSER/.libs"
-	if [ -d "$LIBS_DIR/keras" ]; then
-		pushd "$LIBS_DIR/keras"
-		pip3 install keras
-		popd
-		return;
-	fi
-	
-	mkdir -p $LIBS_DIR
-	pushd $LIBS_DIR
-		git clone https://github.com/keras-team/keras.git
-	pushd keras
-	pip3 install keras
-	popd
-
-	pip list | grep tensorflow
-	pip3 show keras
-}
-
 function configureCMake()
 {
 	DOWNLOADS_DIR="/home/dev/$DOCKERUSER/Downloads"
@@ -277,14 +112,7 @@ function configureCMake()
 		export PATH=$PATH:$DOWNLOADS_DIR/cmake-$CMAKE_VERSION/bin
 		return;
 	fi
-	pushd "$DOWNLOADS_DIR"
-	wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.tar.gz
-	tar -xzvf cmake-$CMAKE_VERSION.tar.gz
-	popd
-
-	export PATH=$PATH:$DOWNLOADS_DIR/cmake-$CMAKE_VERSION/bin
 }
-
 #####################################################################################
 function main()
 {
@@ -292,19 +120,13 @@ function main()
 
 	configureUserDirectory "Downloads"
 	configureUserDirectory "Documents"
-	configureLibsDirectory
-	configureScriptsDirectory
 	installSshKeys
 	configureGit
-	configureSelfSignedCertificate
 	configureMysql
 	configureApache2
 	configureQtCreator
-	configureOpenGl
 	configureCMake
-	installFFMpeg
-	installOpenCV
-	installKeras
+	configureFFMpegScript
 }
 
 main

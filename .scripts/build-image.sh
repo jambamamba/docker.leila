@@ -2,6 +2,15 @@
 set -xe
 
 #####################################################################################
+function parseArgs()
+{
+  for change in $@; do
+      set -- `echo $change | tr '=' ' '`
+      echo "variable name == $1  and variable value == $2"
+      #can assign value to a variable like below
+      eval $1=$2;
+  done
+}
 
 function installPackages()
 {
@@ -27,6 +36,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  dos2unix\
  emacs\
  firefox\
+ fonts-liberation\
  fortune\
  freeglut3-dev\
  gdb\
@@ -153,12 +163,258 @@ function createUser()
 cd /home/dev/\
 "
 }
+function configureLibsDirectory()
+{	
+	LIBS_DIR="/home/dev/.libs"
+	sudo mkdir -p $LIBS_DIR
+	sudo chown -R dev:dev $LIBS_DIR
+	#mv -f /tmp/.libs /home/dev
+	sudo chown -R dev:dev /home/dev/.libs
+}
+function configureScriptsDirectory()
+{
+	sudo mv -f /tmp/.scripts /home/dev
+	sudo chown -R dev:dev /home/dev/.scripts
+}
+function configureSelfSignedCertificate()
+{
+	mv -f /tmp/.certs /home/dev
+	sudo chown -R dev:dev /home/dev/.certs
+	pushd /home/dev/.certs/
+	sudo mkdir -p /home/dev/.ssh/
+	if [[ ! -f "self-signed.crt" || ! -f "self-signed.key" ]]; then
+		openssl req -new -x509 -days 365 -sha1 -newkey rsa:1024 -nodes -keyout server.key -out server.crt -subj '/O=Company/OU=Department/CN=osletek.com'
+		sudo cp server.crt /home/dev/.ssh/self-signed.crt
+		sudo cp server.key /home/dev/.ssh/self-signed.key
+	else
+		sudo cp self-signed.crt /home/dev/.ssh/self-signed.crt
+		sudo cp self-signed.key /home/dev/.ssh/self-signed.key
+	fi
+	popd
+}
+function configureOpenGl()
+{
+	LIBS_DIR="/home/dev/.libs"
+	pushd /
+	sudo mv -f $LIBS_DIR/gl/* /usr/lib/x86_64-linux-gnu/
+	popd
+}
+function installGoogleChromeBrowser()
+{
+	pushd /tmp
+	if [ ! -f "/tmp/google-chrome-stable_current_amd64.deb" ]; then 
+		wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+	fi
 
+	sudo apt --fix-broken install
+	sudo dpkg -i /tmp/google-chrome-stable_current_amd64.deb
+	sudo rm -f /tmp/google-chrome-stable_current_amd64.deb
+	popd
+}
+
+function installLibraryFromCache()
+{
+	parseArgs $@
+	LIBS_DIR="/home/dev/.libs"
+	if [ -d "$LIBS_DIR/$LIBRARY" ]; then
+		pushd $LIBS_DIR/$LIBRARY
+		make install
+		popd
+		RESULT=1
+	fi
+	return
+}
+
+function installXiphLibrary()
+{
+	LIBS_DIR="/home/dev/.libs"
+	RES=0
+	installLibraryFromCache LIBRARY=$1 RESULT=$RES
+	RES=$RESULT
+	if [ $RES -eq 1 ]; then return; fi
+
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	git clone https://github.com/xiph/$1.git
+	pushd $1
+	./autogen.sh
+	./configure --enable-shared
+	make -j$(getconf _NPROCESSORS_ONLN)
+	make install
+	popd
+	popd
+}
+
+function installMp3Lame()
+{
+	LIBS_DIR="/home/dev/.libs"
+	RES=0
+	installLibraryFromCache LIBRARY=mp3lame RESULT=$RES
+	RES=$RESULT
+	if [ $RES -eq 1 ]; then return; fi
+
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	svn checkout https://svn.code.sf.net/p/lame/svn/trunk/lame mp3lame
+	pushd mp3lame
+	./configure --enable-shared --enable-nasm
+	make -j$(getconf _NPROCESSORS_ONLN)
+	make install
+	popd
+	popd
+}
+
+function installVpx()
+{
+	LIBS_DIR="/home/dev/.libs"
+	RES=0
+	installLibraryFromCache LIBRARY=libvpx RESULT=$RES
+	RES=$RESULT
+	if [ $RES -eq 1 ]; then return; fi
+
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	git clone https://chromium.googlesource.com/webm/libvpx
+	pushd libvpx
+	CFLAGS="-fPIC" ./configure --enable-vp8 --enable-vp9 --enable-webm-io --enable-shared
+	make -j$(getconf _NPROCESSORS_ONLN)
+	make install
+	popd
+	popd
+}
+
+function installX264()
+{
+	LIBS_DIR="/home/dev/.libs"
+	RES=0
+	installLibraryFromCache LIBRARY=x264 RESULT=$RES
+	RES=$RESULT
+	if [ $RES -eq 1 ]; then return; fi
+	
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	git clone https://code.videolan.org/videolan/x264.git
+	pushd x264
+	./configure --enable-shared --disable-asm
+	make -j$(getconf _NPROCESSORS_ONLN)
+	make install
+	popd
+	popd
+}
+
+function installFFMpegDependencies()
+{
+	installMp3Lame
+	installXiphLibrary ogg
+	installXiphLibrary vorbis
+	installXiphLibrary theora
+	installVpx
+	installX264
+}
+
+function installFFMpeg()
+{
+	installFFMpegDependencies
+	
+	LIBS_DIR="/home/dev/.libs"
+	RES=0
+	installLibraryFromCache LIBRARY=ffmpeg RESULT=$RES
+	RES=$RESULT
+	if [ $RES -eq 1 ]; then return; fi
+
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg
+	pushd ffmpeg
+	./configure --enable-shared --arch=x86 --enable-libvpx --enable-libtheora --disable-encoder=vorbis --enable-libvorbis --enable-libmp3lame --enable-libx264 --enable-gpl
+	make -j$(getconf _NPROCESSORS_ONLN)
+	popd
+	popd
+}
+
+function installOpenCV()
+{
+	LIBS_DIR="/home/dev/.libs"
+	if [ -d "$LIBS_DIR/opencv/build" ]; then
+		return;
+	fi
+	
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	if [ ! -d "$LIBS_DIR/opencv" ]; then
+		git clone  https://github.com/opencv/opencv.git
+	fi
+	pushd opencv
+	mkdir -p build
+	pushd build
+	cmake ../
+	make -j$(getconf _NPROCESSORS_ONLN)
+	make install
+	popd
+}
+
+function installKeras()
+{
+	LIBS_DIR="/home/dev/.libs"
+	if [ -d "$LIBS_DIR/keras" ]; then
+		pushd "$LIBS_DIR/keras"
+		pip3 install keras
+		popd
+		return 0;
+	fi
+	
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	git clone https://github.com/keras-team/keras.git
+	pushd keras
+	pip3 install keras
+	popd
+
+	pip list | grep tensorflow
+	pip3 show keras
+}
+
+function installCMake()
+{
+	LIBS_DIR="/home/dev/.libs"
+	CMAKE_VERSION="3.19.0-rc2"
+	
+	if [ -d "$LIBS_DIR/cmake-$CMAKE_VERSION/bin" ];then
+		export PATH=$PATH:$LIBS_DIR/cmake-$CMAKE_VERSION/bin
+		return 0;
+	fi
+	
+	mkdir -p $LIBS_DIR
+	pushd "$LIBS_DIR"
+	wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.tar.gz
+	tar -xzvf cmake-$CMAKE_VERSION.tar.gz
+	pushd cmake-$CMAKE_VERSION
+	./configure
+	make -j$(getconf _NPROCESSORS_ONLN)
+	popd
+	popd
+
+	export PATH=$PATH:$LIBS_DIR/cmake-$CMAKE_VERSION/bin
+}
+function setLibsOwnership()
+{
+	sudo chown -R dev:dev /home/dev/.libs
+}
 function main()
 {
 	installPackages
 	makeUserDirectories
 	createUser
+	configureLibsDirectory
+	configureScriptsDirectory
+	configureSelfSignedCertificate
+	configureOpenGl
+	installGoogleChromeBrowser
+	installCMake
+	installFFMpeg
+	installOpenCV
+	installKeras
+	setLibsOwnership
 }
 
 main
