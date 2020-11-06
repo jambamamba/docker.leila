@@ -73,7 +73,7 @@ function configureApache2()
 function configureQtCreator()
 {
 	SCRIPTS_DIR="/home/dev/.scripts"
-	sudo ln -s $SCRIPTS_DIR/qtcreator.sh /usr/local/bin/qtcreator
+	sudo cp $SCRIPTS_DIR/qtcreator.sh /usr/local/bin/qtcreator
 	sudo rm -fr /home/dev/.config
 	sudo ln -s /home/dev/$DOCKERUSER/.config /home/dev/.config
 }
@@ -97,11 +97,9 @@ $LIBS_DIR/x264
 	sudo ldconfig
 
 	SCRIPTS_DIR="/home/dev/.scripts"
-	pushd /
-	ln -s $SCRIPTS_DIR/ff.sh $LIBS_DIR/ffmpeg/ff.sh
-	popd
-
-	export PATH=$PATH:$SCRIPTS_DIR/ffmpeg
+	export PATH=$PATH:$SCRIPTS_DIR:$LIBS_DIR/ffmpeg
+	
+	rm $SCRIPTS_DIR/build-image.sh
 }
 function configureCMake()
 {
