@@ -140,6 +140,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  python3 -m pip install --upgrade pip
  pip3 install setuptools
  pip3 install tensorflow
+ pip3 install opencv-python
 }
 
 function makeUserDirectories()
