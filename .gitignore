@@ -8,4 +8,6 @@
 .libs/theora
 .libs/vorbis
 .libs/x264
+.libs/alsa-lib
+.libs/giflib
 

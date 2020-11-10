@@ -124,6 +124,10 @@ function main()
 	configureQtCreator
 	configureCMake
 	configureFFMpegScript
+
+# copy built libs back to directory so next time its faster to build docker image:
+#sudo rsync -uav ~/.libs ~/osaeed/leila.docker/
+
 }
 
 main
