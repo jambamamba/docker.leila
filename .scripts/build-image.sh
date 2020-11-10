@@ -369,7 +369,7 @@ function installAlsa()
 	pushd alsa-lib
 	libtoolize
 	aclocal
-	automake --add-missing --force-missing --copy --foreign
+	automake --add-missing --force-missing --copy --foreign && true
 	autoreconf
 	./configure 
 	make -j$(getconf _NPROCESSORS_ONLN)
@@ -454,7 +454,7 @@ function main()
 	configureOpenGl
 	installGoogleChromeBrowser
 	installCMake
-	installAlsa
+	#installAlsa
 	installGifLib
 	installFFMpeg
 	installOpenCV
