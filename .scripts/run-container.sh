@@ -103,10 +103,10 @@ $LIBS_DIR/x264
 }
 function configureCMake()
 {
-	DOWNLOADS_DIR="/home/dev/$DOCKERUSER/Downloads"
+	LIBS_DIR="/home/dev/.libs"
 	CMAKE_VERSION="3.19.0-rc2"
-	if [ -d "$DOWNLOADS_DIR/cmake-$CMAKE_VERSION" ]; then
-		export PATH=$PATH:$DOWNLOADS_DIR/cmake-$CMAKE_VERSION/bin
+	if [ -d "$LIBS_DIR/cmake-$CMAKE_VERSION/bin" ]; then
+		export PATH=$PATH:$LIBS_DIR/cmake-$CMAKE_VERSION/bin
 		return;
 	fi
 }

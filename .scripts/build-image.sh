@@ -66,6 +66,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  libidn11\
  libjpeg-dev\
  libjpeg-dev\
+ libncurses5-dev\
  libonig-dev\
  libopenexr-dev\
  libpng-dev\
@@ -352,6 +353,47 @@ function installOpenCV()
 	make -j$(getconf _NPROCESSORS_ONLN)
 	make install
 	popd
+	popd
+}
+
+function installAlsa()
+{
+	LIBS_DIR="/home/dev/.libs"
+	if [ -d "$LIBS_DIR/alsa-lib" ]; then
+		return;
+	fi
+	
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	git clone https://github.com/alsa-project/alsa-lib.git
+	pushd alsa-lib
+	libtoolize
+	aclocal
+	automake --add-missing --force-missing --copy --foreign
+	autoreconf
+	./configure 
+	make -j$(getconf _NPROCESSORS_ONLN)
+	make install
+	popd
+	popd
+}
+
+function installGifLib()
+{
+	LIBS_DIR="/home/dev/.libs"
+	if [ -d "$LIBS_DIR/giflib" ]; then
+		return;
+	fi
+	
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	git clone https://github.com/mldbai/giflib.git
+	pushd giflib
+	./configure 
+	make -j$(getconf _NPROCESSORS_ONLN)
+	make install
+	popd
+	popd
 }
 
 function installKeras()
@@ -390,7 +432,7 @@ function installCMake()
 	wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.tar.gz
 	tar -xzvf cmake-$CMAKE_VERSION.tar.gz
 	pushd cmake-$CMAKE_VERSION
-	./configure
+	./configure --parallel=$(getconf _NPROCESSORS_ONLN)
 	make -j$(getconf _NPROCESSORS_ONLN)
 	popd
 	popd
@@ -412,6 +454,8 @@ function main()
 	configureOpenGl
 	installGoogleChromeBrowser
 	installCMake
+	installAlsa
+	installGifLib
 	installFFMpeg
 	installOpenCV
 	installKeras
