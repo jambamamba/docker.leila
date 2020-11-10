@@ -126,7 +126,7 @@ function main()
 	configureFFMpegScript
 
 # copy built libs back to directory so next time its faster to build docker image:
-#sudo rsync -uav ~/.libs ~/osaeed/leila.docker/
+#sudo rsync -uav ~/.libs ~/$DOCKERUSER/leila.docker/
 
 }
 
