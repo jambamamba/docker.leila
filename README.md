@@ -9,26 +9,19 @@ lspci | grep VGA
 ```
 It should read something like this "NVIDIA Corporation GP104 [GeForce GTX 1080] (rev a1)"
 
-## Get the files, build the Docker image, then enter it:
+## Get the files, build the Docker image, then start the Docker container:
 ```bash
 git clone https://github.com/jambamamba/leila.docker.git
 cd leila.docker
 ./builddocker.sh
 ./enterdocker.sh
 ```
-If it fails to build, then try 
-```bash
-docker pull tensorflow/tensorflow:latest-gpu-jupyter
-```
-then follow with the builddocker.sh script above
-
-If it asks for password when you run enterdocker.sh script, the password is:
+When it asks for password when you run enterdocker.sh script, the password is:
 ```bash
 dev
 ```
 
-
-## Just building the Docker container
+## Just building the Docker image
 ```bash
 ./builddocker.sh
 ```
