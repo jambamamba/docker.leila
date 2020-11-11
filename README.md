@@ -32,7 +32,9 @@ dev
 ```
 
 ## Exiting the container
+```bash
 exit 
+```
 (from inside the container)
 
 ## Re-entering a running container
