@@ -493,7 +493,7 @@ function main()
 	installGifLib
 	installFFMpeg
 	installOpenCV
-	installBazel
+	#installBazel
 	#installTensorflow
 	installKeras
 	setLibsOwnership
