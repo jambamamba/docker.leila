@@ -139,9 +139,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  yasm\
 
  python3 -m pip install --upgrade pip
- pip3 install setuptools
- pip3 install tensorflow
- pip3 install opencv-python
+ pip3 install setuptools tensorflow opencv-python scikit-image imgaug pycocotools matplotlib numpy keras_preprocessing
 }
 
 function makeUserDirectories()
@@ -439,6 +437,43 @@ function installCMake()
 
 	export PATH=$PATH:$LIBS_DIR/cmake-$CMAKE_VERSION/bin
 }
+function installBazel()
+{
+	sudo apt install curl gnupg
+	curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg
+	sudo mv bazel.gpg /etc/apt/trusted.gpg.d/
+	echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+	
+	sudo apt update && sudo apt install -y bazel
+	sudo apt update && sudo apt full-upgrade
+}
+
+function installTensorflow()
+{
+	LIBS_DIR="/home/dev/.libs"
+	if [ -d "$LIBS_DIR/tensorflow" ]; then
+		pushd "$LIBS_DIR/tensorflow"
+		return 0;
+	fi
+	
+	mkdir -p $LIBS_DIR
+	pushd $LIBS_DIR
+	git clone https://github.com/tensorflow/tensorflow.git
+	pushd tensorflow
+	git checkout r1.4
+	yes "" | ./configure -y cuda=Y -march=native --config=mkl --config=v1
+	#/usr/local/cuda-10.1/targets/x86_64-linux/lib/
+	bazel build --config=v1 //tensorflow/tools/pip_package:build_pip_package
+	bazel build --config=cuda --config=v1 //tensorflow/tools/pip_package:build_pip_package 
+	bazel build //tensorflow/tools/pip_package:build_pip_package 
+	#./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+	popd
+
+	pip list | grep tensorflow
+	pip3 show keras
+
+}
+
 function setLibsOwnership()
 {
 	sudo chown -R dev:dev /home/dev/.libs
@@ -454,10 +489,12 @@ function main()
 	configureOpenGl
 	installGoogleChromeBrowser
 	installCMake
-	#installAlsa
+	installAlsa
 	installGifLib
 	installFFMpeg
 	installOpenCV
+	installBazel
+	#installTensorflow
 	installKeras
 	setLibsOwnership
 }
