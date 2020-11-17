@@ -80,6 +80,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  libtiff-dev\
  libtiff-dev\
  libtool\
+ libqt5x11extras5-dev\
  libwebp-dev\
  libxcb-icccm4\
  libxcb-image0\
