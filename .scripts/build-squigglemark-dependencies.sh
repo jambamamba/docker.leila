@@ -247,6 +247,8 @@ function installAllLibs()
 	echo "/home/dev/lib" > /tmp/leila.conf
 	sudo mv /tmp/leila.conf /etc/ld.so.conf.d/leila.conf
 	sudo ldconfig
+
+	sudo cp -r /tmp/.leila /home/dev/$DOCKERUSER/
 }
 
 function main()

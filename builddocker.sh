@@ -10,7 +10,7 @@ function dockerImageExists()
 	parseArgs $@
 	
 	RES=$(docker inspect --type=image $IMAGE_NAME) && true
-	if [ $RES == "[]" ]; then
+	if [ "$RES" == "[]" ]; then
 		RES="false"
 	else
 		RES="true"
