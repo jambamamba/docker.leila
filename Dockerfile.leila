@@ -1,0 +1,16 @@
+FROM leila-base
+
+EXPOSE 443
+EXPOSE 80
+ADD .certs /tmp/.certs
+ADD .scripts /tmp/.scripts
+ADD .cache /tmp/.leila/cache
+ADD gl /tmp/gl
+COPY etc.apache2.tar.xz /tmp/etc.apache2.tar.xz
+WORKDIR /home/dev
+ENV HOME /home/dev
+ENV PATH="${PATH}:/usr/games"
+ENV CC=/usr/bin/clang
+ENV CXX=/usr/bin/clang++
+RUN /tmp/.scripts/build-image.sh
+USER dev

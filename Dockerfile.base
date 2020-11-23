@@ -1,0 +1,4 @@
+FROM tensorflow/tensorflow:latest-gpu-jupyter
+
+ADD .scripts /tmp/.scripts
+RUN /tmp/.scripts/install-packages.sh
