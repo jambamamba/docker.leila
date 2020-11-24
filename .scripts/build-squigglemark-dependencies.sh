@@ -86,30 +86,30 @@ function installXiphLibrary()
 
 function installMp3Lame()
 {
-	libExists LIB="mp3lame" RESULT=0
+	local LIB="mp3lame"
+	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	local LIB="mp3lame"
 	procureLib SCM="svn" SCM_CMD="checkout" URL="https://svn.code.sf.net/p/lame/svn/trunk/lame" LIB=$LIB
 	makeLib LIB=${LIB} CONF_FLAGS="--enable-shared#--enable-nasm"
 }
 
 function installVpx()
 {
+	local LIB="vpx"
 	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	local LIB="vpx"
 	procureLib SCM="git" SCM_CMD="clone" URL="https://chromium.googlesource.com/webm/lib$LIB" LIB=$LIB
 	makeLib LIB=${LIB} CFLAGS="-fPIC" CONF_FLAGS="--enable-shared#--enable-vp8#--enable-vp9#--enable-webm-io"
 }
 
 function installX264()
 {
+	local LIB="x264"
 	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	local LIB="x264"
 	procureLib SCM="git" SCM_CMD="clone" URL="https://code.videolan.org/videolan/$LIB.git" LIB=$LIB
 	makeLib LIB=${LIB} CONF_FLAGS="--enable-shared#--disable-asm"
 }
@@ -149,10 +149,10 @@ function installFFMpeg()
 
 function installOpenCV()
 {
+	local LIB="opencv"
 	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	local LIB="opencv"
 	procureLib SCM="git" SCM_CMD="clone" URL="https://github.com/opencv/$LIB.git" LIB=$LIB
 	makeLib LIB=${LIB} BUILDSYSTEM="cmake"
 }
@@ -175,10 +175,10 @@ function installAlsa()
 
 function installGifLib()
 {
+	local LIB="gif"
 	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	local LIB="gif"
 	procureLib SCM="git" SCM_CMD="clone" URL="https://github.com/mldbai/giflib.git" LIB=$LIB
 	makeLib LIB=${LIB} CONF_FLAGS="--enable-shared"
 }
