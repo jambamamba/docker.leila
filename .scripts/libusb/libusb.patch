@@ -1,0 +1,56 @@
+diff --git a/driver/usb/libusb_options.h b/driver/usb/libusb_options.h
+index a1c70e9..d74799a 100644
+--- a/driver/usb/libusb_options.h
++++ b/driver/usb/libusb_options.h
+@@ -16,6 +16,7 @@
+ #define DARWINN_DRIVER_USB_LIBUSB_OPTIONS_H_
+ 
+ #include "port/statusor.h"
++#define DARWINN_PORT_USE_EXTERNAL 1
+ #if DARWINN_PORT_USE_EXTERNAL
+ #include "libusb/libusb.h"
+ #else  // !DARWINN_PORT_USE_EXTERNAL
+diff --git a/driver/usb/local_usb_device.h b/driver/usb/local_usb_device.h
+index 8638f5f..3f95a1c 100644
+--- a/driver/usb/local_usb_device.h
++++ b/driver/usb/local_usb_device.h
+@@ -28,6 +28,7 @@
+ #include "port/integral_types.h"
+ #include "port/statusor.h"
+ #include "port/thread_annotations.h"
++#define DARWINN_PORT_USE_EXTERNAL 1
+ #if DARWINN_PORT_USE_EXTERNAL
+ #include "libusb/libusb.h"
+ #else  // !DARWINN_PORT_USE_EXTERNAL
+diff --git a/libedgetpu_cc_rules.bzl b/libedgetpu_cc_rules.bzl
+index adc1059..485cd32 100644
+--- a/libedgetpu_cc_rules.bzl
++++ b/libedgetpu_cc_rules.bzl
+@@ -31,7 +31,7 @@ DARWIN_OPT_LINKOPTS = []
+ 
+ LINUX_COPTS = []
+ LINUX_LINKOPTS = [
+-    "-l:libusb-1.0.so",
++    "-l:libusb.so",
+ ]
+ LINUX_OPT_LINKOPTS = [
+     "-Wl,--strip-all",
+diff --git a/workspace.bzl b/workspace.bzl
+index 5d05c69..ee9301a 100644
+--- a/workspace.bzl
++++ b/workspace.bzl
+@@ -59,12 +59,12 @@ def libedgetpu_dependencies(
+ def _libusb_impl(ctx):
+     lower_name = ctx.os.name.lower()
+     if lower_name.startswith("linux"):
+-        path = "/usr/include"
++        path = "/home/dev/oosman/.leila/lib/libusb"
+         build_file_content = """
+ cc_library(
+   name = "headers",
+   includes = ["root"],
+-  hdrs = ["root/libusb-1.0/libusb.h"],
++  hdrs = ["root/libusb/libusb.h"],
+   visibility = ["//visibility:public"],
+ )
+ """

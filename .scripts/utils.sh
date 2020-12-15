@@ -94,15 +94,17 @@ function libExists()
 
 function makeLib()
 {
+	local CMAKE_BUILD_DIR="build"
+	local CMAKE_TOOLCHAIN_FILE=""
 	parseArgs $@
 
 	pushd $LIBS_DIR/${LIB}
 	if [ "$BUILDSYSTEM" == "cmake" ]; then
-		mkdir -p build
-		pushd build
-		cmake ../
+		mkdir -p $CMAKE_BUILD_DIR
+		pushd $CMAKE_BUILD_DIR
+		cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE ../
 		make -j$(getconf _NPROCESSORS_ONLN)
-		find . -name "lib*.so*" | xargs cp -Pt $BUILD_DIR/
+		$(find . -name "lib*.so*" | xargs cp -Pt $BUILD_DIR/) && true
 		popd
 	else
 		CONF_FLAGS="${CONF_FLAGS//#/ }" #replace all # signs with spaces

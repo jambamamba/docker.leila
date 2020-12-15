@@ -70,6 +70,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  libtiff-dev\
  libtool\
  libqt5x11extras5-dev\
+ libusb-dev\
  libwebp-dev\
  libxcb-icccm4\
  libxcb-image0\
@@ -129,9 +130,26 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  vim\
  wget\
  yasm\
+ gnupg\
 
- python3 -m pip install --upgrade pip
- pip3 install setuptools tensorflow opencv-python scikit-image imgaug pycocotools matplotlib numpy keras_preprocessing
+# crossbuild-essential-armhf\
+# crossbuild-essential-arm64\
+# libpython3-dev:armhf\
+# libpython3-dev:arm64\
+# libusb-1.0-0-dev:armhf\
+# libusb-1.0-0-dev:arm64\
+
+# dpkg --add-architecture armhf
+# dpkg --add-architecture arm64
+ 
+  curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg
+  mv bazel.gpg /etc/apt/trusted.gpg.d/
+  echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
+  apt update
+  apt install -y bazel graphviz xdot
+
+  python3 -m pip install --upgrade pip
+  pip3 install setuptools tensorflow opencv-python scikit-image imgaug pycocotools matplotlib numpy keras_preprocessing
 }
 
 installPackages

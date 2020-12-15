@@ -46,6 +46,12 @@ function configureSelfSignedCertificate()
 	fi
 	popd
 }
+function installPublicPrivateKeys()
+{	
+	sudo chown -R dev:dev ~/.ssh
+	rm -fr ~/.ssh/id_rsa
+	ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+}
 
 function configureOpenGl()
 {
@@ -93,6 +99,7 @@ function main()
 	createUser
 	configureScriptsDirectory
 	configureSelfSignedCertificate
+	installPublicPrivateKeys
 	configureOpenGl
 	installGoogleChromeBrowser
 	installCMake

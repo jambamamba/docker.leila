@@ -17,10 +17,10 @@ function installZLib()
 
 function installPngLib()
 {
-	libExists LIB="png" RESULT=0
+	local LIB="libpng-1.6.37"
+	libExists LIB="${LIB}" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	local LIB="libpng-1.6.37"
 	local EXT="tar.xz"
 	local URL="https://download.sourceforge.net/libpng/${LIB}.${EXT}"
 	procureLib LIB=${LIB} EXT=${EXT} URL=${URL}
@@ -57,10 +57,10 @@ function installJpegLib()
 
 function installFreetypeLib()
 {
-	libExists LIB="freetype" RESULT=0
+	local LIB="freetype-2.10.4"
+	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	local LIB="freetype-2.10.0"
 	local EXT="tar.gz"
 	local URL="https://download.savannah.gnu.org/releases/freetype/${LIB}.${EXT}"
 	procureLib LIB=${LIB} EXT=${EXT} URL=${URL}
@@ -71,10 +71,11 @@ function installXiphLibrary()
 {
 	parseArgs $@
 
-	libExists LIB="$LIB" RESULT=0
+	local LIB_NAME=$LIB
+	libExists LIB="lib${LIB}" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	procureLib SCM="git" SCM_CMD="clone" URL="https://github.com/xiph/${LIB}.git" LIB=$LIB
+	procureLib SCM="git" SCM_CMD="clone" URL="https://github.com/xiph/${LIB_NAME}.git" LIB=${LIB}
 	pushd $LIBS_DIR/${LIB}
 	./autogen.sh
 	popd
@@ -86,7 +87,7 @@ function installXiphLibrary()
 
 function installMp3Lame()
 {
-	local LIB="mp3lame"
+	local LIB="libmp3lame"
 	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
@@ -96,21 +97,21 @@ function installMp3Lame()
 
 function installVpx()
 {
-	local LIB="vpx"
+	local LIB="libvpx"
 	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	procureLib SCM="git" SCM_CMD="clone" URL="https://chromium.googlesource.com/webm/lib$LIB" LIB=$LIB
+	procureLib SCM="git" SCM_CMD="clone" URL="https://chromium.googlesource.com/webm/${LIB}.git" LIB=$LIB
 	makeLib LIB=${LIB} CFLAGS="-fPIC" CONF_FLAGS="--enable-shared#--enable-vp8#--enable-vp9#--enable-webm-io"
 }
 
 function installX264()
 {
-	local LIB="x264"
+	local LIB="libx264"
 	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	procureLib SCM="git" SCM_CMD="clone" URL="https://code.videolan.org/videolan/$LIB.git" LIB=$LIB
+	procureLib SCM="git" SCM_CMD="clone" URL="https://code.videolan.org/videolan/x264.git" LIB=$LIB
 	makeLib LIB=${LIB} CONF_FLAGS="--enable-shared#--disable-asm"
 }
 
@@ -126,8 +127,8 @@ function installFFMpegDependencies()
 
 function copyFFMpegBinaries()
 {
-	cp "$LIBS_DIR/ffmpeg/ffmpeg" $DOCKER_BIN/
-	cp "$LIBS_DIR/ffmpeg/ffplay" $DOCKER_BIN/
+	cp -f "$LIBS_DIR/ffmpeg/ffmpeg" $DOCKER_BIN/
+	cp -f "$LIBS_DIR/ffmpeg/ffplay" $DOCKER_BIN/
 }
 
 function installFFMpeg()
@@ -153,7 +154,7 @@ function installOpenCV()
 	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	procureLib SCM="git" SCM_CMD="clone" URL="https://github.com/opencv/$LIB.git" LIB=$LIB
+	procureLib SCM="git" SCM_CMD="clone" URL="https://github.com/opencv/opencv.git" LIB=$LIB
 	makeLib LIB=${LIB} BUILDSYSTEM="cmake"
 }
 
@@ -162,8 +163,8 @@ function installAlsa()
 	libExists LIB="sound" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
-	local LIB="alsa"
-	procureLib SCM="git" SCM_CMD="clone" URL="https://github.com/alsa-project/$LIB-lib.git" LIB=$LIB
+	local LIB="libalsa"
+	procureLib SCM="git" SCM_CMD="clone" URL="https://github.com/alsa-project/alsa-lib.git" LIB=$LIB
 	pushd $LIBS_DIR/${LIB}
 	libtoolize
 	aclocal
@@ -175,7 +176,7 @@ function installAlsa()
 
 function installGifLib()
 {
-	local LIB="gif"
+	local LIB="libgif"
 	libExists LIB="$LIB" RESULT=0
 	if [ $RESULT -gt 0 ]; then return 0; fi
 
@@ -183,59 +184,6 @@ function installGifLib()
 	makeLib LIB=${LIB} CONF_FLAGS="--enable-shared"
 }
 
-function installKeras()
-{
-	if [ -d "$LIBS_DIR/keras" ]; then
-		pushd "$LIBS_DIR/keras"
-		pip3 install keras
-		popd
-		return 0;
-	fi
-
-	pushd $LIBS_DIR
-	git clone https://github.com/keras-team/keras.git
-	pushd keras
-	pip3 install keras
-	popd
-
-	pip list | grep tensorflow
-	pip3 show keras
-}
-
-function installBazel()
-{
-	sudo apt install curl gnupg
-	curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg
-	sudo mv bazel.gpg /etc/apt/trusted.gpg.d/
-	echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-
-	sudo apt update && sudo apt install -y bazel
-	sudo apt update && sudo apt full-upgrade
-}
-
-function installTensorflow()
-{
-	if [ -d "$LIBS_DIR/tensorflow" ]; then
-		pushd "$LIBS_DIR/tensorflow"
-		return 0;
-	fi
-
-	pushd $LIBS_DIR
-	git clone https://github.com/tensorflow/tensorflow.git
-	pushd tensorflow
-	git checkout r1.4
-	yes "" | ./configure -y cuda=Y -march=native --config=mkl --config=v1
-	#/usr/local/cuda-10.1/targets/x86_64-linux/lib/
-	bazel build --config=v1 //tensorflow/tools/pip_package:build_pip_package
-	bazel build --config=cuda --config=v1 //tensorflow/tools/pip_package:build_pip_package
-	bazel build //tensorflow/tools/pip_package:build_pip_package
-	#./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
-	popd
-
-	pip list | grep tensorflow
-	pip3 show keras
-
-}
 
 function installAllLibs()
 {
@@ -247,8 +195,6 @@ function installAllLibs()
 	echo "/home/dev/lib" > /tmp/leila.conf
 	sudo mv /tmp/leila.conf /etc/ld.so.conf.d/leila.conf
 	sudo ldconfig
-
-	sudo cp -r /tmp/.leila /home/dev/$DOCKERUSER/
 }
 
 function main()
@@ -262,9 +208,6 @@ function main()
 	installGifLib
 	installFFMpeg
 	installOpenCV
-	#installBazel
-	#installTensorflow
-	installKeras
 	installAllLibs
 }
 
