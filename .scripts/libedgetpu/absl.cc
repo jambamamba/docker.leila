@@ -1,1 +1,0 @@
-int abslPlaceholder() { return 0; }

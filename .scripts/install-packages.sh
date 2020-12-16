@@ -17,6 +17,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  bison\
  build-essential\
  chromium-browser\
+ chrpath\
  clang\
  cowsay\
  cpio\
@@ -31,6 +32,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  gdb\
  gedit\
  genext2fs\
+ gnupg\
  htop\
  inetutils-ping\
  jq\
@@ -44,6 +46,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  libc++abi-dev\
  libcgal-dev\
  libcurl4-openssl-dev\
+ libgd-dev\
  libgl1-mesa-dev\
  libglew-dev\
  libglfw3-dev\
@@ -62,6 +65,8 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  libpng-dev\
  libprotobuf-dev\
  libpulse-mainloop-glib0\
+ libqt5x11extras5-dev\
+ libsdl2-dev\
  libsqlite3-dev\
  libssl-dev\
  libsuitesparse-dev\
@@ -69,7 +74,6 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  libtiff-dev\
  libtiff-dev\
  libtool\
- libqt5x11extras5-dev\
  libusb-dev\
  libwebp-dev\
  libxcb-icccm4\
@@ -84,10 +88,8 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  libxrandr-dev\
  libxss1\
  libxxf86vm-dev\
- libsdl2-dev\
  libxxf86vm1\
  libzip-dev\
- libgd-dev\
  mcrypt\
  meld\
  mysql-server\
@@ -115,8 +117,8 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  python3-h5py\
  python3-numpy\
  python3-scipy\
- python3.pip\
  python3-yaml\
+ python3.pip\
  python3\
  re2c\
  rpm2cpio\
@@ -126,11 +128,11 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  sshfs\
  subversion\
  thunar\
+ tig\
  ufw\
  vim\
  wget\
  yasm\
- gnupg\
 
 # crossbuild-essential-armhf\
 # crossbuild-essential-arm64\
@@ -141,7 +143,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
 
 # dpkg --add-architecture armhf
 # dpkg --add-architecture arm64
- 
+
   curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg
   mv bazel.gpg /etc/apt/trusted.gpg.d/
   echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
