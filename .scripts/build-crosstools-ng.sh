@@ -3,15 +3,15 @@ set -e
 
 function main()
 {
-	local PI_ROOT="pi"
+	local PI_TOOLCHAIN_ROOT_DIR=${HOME}/${DOCKERUSER}/pi
 	
-	if [ -d ${HOME}/${DOCKERUSER}/${PI_ROOT} ]; then 
-		echo "${HOME}/${DOCKERUSER}/${PI_ROOT} already exists. Exiting..."
+	if [ -d ${PI_TOOLCHAIN_ROOT_DIR} ]; then 
+		echo "${PI_TOOLCHAIN_ROOT_DIR} already exists. Exiting..."
 		exit(0)
 	fi
 	
-	mkdir -p  ${HOME}/${DOCKERUSER}/${PI_ROOT}/src/
-	pushd ${HOME}/${DOCKERUSER}/${PI_ROOT}/src/
+	mkdir -p  ${PI_TOOLCHAIN_ROOT_DIR}/src/
+	pushd ${PI_TOOLCHAIN_ROOT_DIR}/src/
 	
 	local VERSION="1.24.0"
 	if [ ! -d crosstool-ng-$VERSION ]; then
@@ -26,16 +26,16 @@ function main()
 	#sudo apt-get install -y bison cvs flex gperf texinfo automake libtool unzip help2man gawk libtool-bin libtool-doc libncurses5-dev libncursesw5-dev protobuf-compiler kpartx
 
 	if [ ! -f config.h ]; then
-		./configure --prefix=${HOME}/${DOCKERUSER}/${PI_ROOT}/crosstool-ng
+		./configure --prefix=${PI_TOOLCHAIN_ROOT_DIR}/crosstool-ng
 	fi
 	make -j8
 	#make install
 
-	export PATH=$PATH:${HOME}/${DOCKERUSER}/${PI_ROOT}/crosstool-ng/bin
-	export PI_ROOT=${PI_ROOT}
+	export PATH=$PATH:${PI_TOOLCHAIN_ROOT_DIR}/crosstool-ng/bin
+	export PI_TOOLCHAIN_ROOT_DIR=${PI_TOOLCHAIN_ROOT_DIR}
 
-	mkdir -p ${HOME}/${DOCKERUSER}/${PI_ROOT}/src/staging
-	pushd ${HOME}/${DOCKERUSER}/${PI_ROOT}/src/staging
+	mkdir -p ${PI_TOOLCHAIN_ROOT_DIR}/src/staging
+	pushd ${PI_TOOLCHAIN_ROOT_DIR}/src/staging
 	unset CC
 	unset CXX
 	unset LD_LIBRARY_PATH
@@ -69,6 +69,10 @@ function main()
 	popd
 	popd
 	popd
+	
+	if [ ! -f ${PI_TOOLCHAIN_ROOT_DIR}/Toolchain-RaspberryPi.cmake ]; then
+		ln -s ${HOME}/.scripts/Toolchain-RaspberryPi.cmake ${PI_TOOLCHAIN_ROOT_DIR}/Toolchain-RaspberryPi.cmake
+	fi
 }
 
 main
