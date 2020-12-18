@@ -1,13 +1,13 @@
-#!/bin/bash -e
-set -e
+#!/bin/bash -ex
+set -ex
 
 function main()
 {
-	local PI_TOOLCHAIN_ROOT_DIR=${HOME}/${DOCKERUSER}/pi
+	local PI_TOOLCHAIN_ROOT_DIR=${HOME}/${DOCKERUSER}/pi2
 	
 	if [ -d ${PI_TOOLCHAIN_ROOT_DIR} ]; then 
 		echo "${PI_TOOLCHAIN_ROOT_DIR} already exists. Exiting..."
-		exit(0)
+		exit 0
 	fi
 	
 	mkdir -p  ${PI_TOOLCHAIN_ROOT_DIR}/src/
@@ -15,11 +15,14 @@ function main()
 	
 	local VERSION="1.24.0"
 	if [ ! -d crosstool-ng-$VERSION ]; then
+		mkdir -p ${HOME}/${DOCKERUSER}/Downloads
+		pushd ${HOME}/${DOCKERUSER}/Downloads
 		if [ ! -f crosstool-ng-$VERSION.tar.bz2 ]; then
 			wget http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-$VERSION.tar.bz2
 		fi
+		popd
+		ln -s ${HOME}/${DOCKERUSER}/Downloads/crosstool-ng-$VERSION.tar.bz2 crosstool-ng-$VERSION.tar.bz2
 		tar xjf crosstool-ng-$VERSION.tar.bz2
-		rm -f crosstool-ng-$VERSION.tar.bz2
 	fi
 	pushd crosstool-ng-$VERSION
 
@@ -29,7 +32,7 @@ function main()
 		./configure --prefix=${PI_TOOLCHAIN_ROOT_DIR}/crosstool-ng
 	fi
 	make -j8
-	#make install
+	make install
 
 	export PATH=$PATH:${PI_TOOLCHAIN_ROOT_DIR}/crosstool-ng/bin
 	export PI_TOOLCHAIN_ROOT_DIR=${PI_TOOLCHAIN_ROOT_DIR}
@@ -47,10 +50,10 @@ function main()
 	#Paths and misc options > Prefix directory >  /home/oosman/pi2/x-tools/${CT_TARGET}  
 	#			> Number of parallel jobs 8 
 	#Target options > Target Architecture 	> arm
+	#					> Suffix to the arch-part > rpi
 	#					> Floating point : hardward FPU
 	#					> Emit assembly for CPU (none)
-	#		> tune for cpu (nothing, no ev4)
-	#
+	#					> tune for cpu (nothing, no ev4)
 	#Operating System > Target OS > linux
 	#Binary utilities > Linkers to enable > ld,gold
 	#					> Enable threaded gold
@@ -65,7 +68,7 @@ function main()
 	#Save
 			
 	cp -f ${HOME}/.scripts/crosstool-ng.raspi0.config .config
-	ct-ng build
+	${PI_TOOLCHAIN_ROOT_DIR}/crosstool-ng/bin/ct-ng build
 	popd
 	popd
 	popd
