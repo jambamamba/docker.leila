@@ -40,6 +40,9 @@ if [ "$1" == "clean" ]; then
 	docker system prune -af
 elif [ "$1" == "base" ]; then
 	buildBaseImage
+elif [ "$1" == "all" ]; then
+	buildBaseImage
+	buildLeilaImage
 else
 	dockerImageExists IMAGE_NAME="leila-base" RES=0
 	if [ $RES == "false" ]; then
