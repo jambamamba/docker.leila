@@ -76,6 +76,7 @@ class Application:
                 bytesAddressPair = self.discovery_socket.recvfrom(self.buffer_size)
             except socket.timeout:
                 print("timedout")
+                time.sleep(1)
                 continue
             self.updateIpmDb(bytesAddressPair[0], bytesAddressPair[1])
             time.sleep(1)
