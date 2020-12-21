@@ -68,6 +68,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  libidn11\
  libjpeg-dev\
  libjpeg-dev\
+ libmount-dev\
  libncurses5-dev\
  libncurses5-dev\
  libncursesw5-dev\
@@ -107,7 +108,6 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  libzip-dev\
  mcrypt\
  meld\
- meson\
  mysql-server\
  nasm\
  ninja-build\
@@ -170,7 +170,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
   apt install -y bazel graphviz xdot
 
   python3 -m pip install --upgrade pip
-  pip3 install setuptools tensorflow opencv-python scikit-image imgaug pycocotools matplotlib numpy keras_preprocessing
+  pip3 install setuptools tensorflow opencv-python scikit-image imgaug pycocotools matplotlib numpy keras_preprocessing meson
 }
 
 installPackages
