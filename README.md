@@ -1,3 +1,5 @@
+<img src="res/Leila-1929-600.jpeg"\>
+
 # docker.leila
 Docker container based on tensorflow/tensorflow:latest-gpu-jupyter.
 Comes with TensorFlow pre-installed.
