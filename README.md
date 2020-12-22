@@ -13,7 +13,7 @@ It should read something like this "NVIDIA Corporation GP104 [GeForce GTX 1080] 
 ```bash
 git clone https://github.com/jambamamba/docker.leila.git
 cd docker.leila
-./builddocker.sh
+./build.sh
 ./enterdocker.sh
 ```
 When it asks for password when you run enterdocker.sh script, the password is:
@@ -23,7 +23,7 @@ dev
 
 ## Just building the Docker image
 ```bash
-./builddocker.sh
+./build.sh
 ```
 
 ## Entering the Docker container
