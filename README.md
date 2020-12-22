@@ -21,9 +21,17 @@ When it asks for password when you run enterdocker.sh script, the password is:
 dev
 ```
 
-## Just building the Docker image
+## Building the Docker image
 ```bash
 ./build.sh
+```
+
+### More commands
+```bash
+./build.sh clean #this will purge all docker images from your system, not just docker.leila!
+./build.sh base  #just build the first layer (that installs Ubuntu packages)
+./build.sh all   #build all layers
+./build.sh       #builds base layer if missing, then builds final layer on top, otherwise just builds final layer 
 ```
 
 ## Entering the Docker container
