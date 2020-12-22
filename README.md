@@ -42,3 +42,21 @@ exit
 ./attachdocker.sh
 ```
 
+## Permission error when entering container
+
+If you get permission error
+
+```bash
+sudo groupadd docker
+sudo usermod -aG docker ${USER}
+```
+
+Then logout, and login again.
+
+## Cannot run GUI apps inside container
+
+If you cannot run GUI apps inside the Docker container, like gedit, then from host you may need to grant X-server permission so your Docker container GUI app can run:
+
+``bash
+xhost +
+```
