@@ -1,4 +1,6 @@
-<img src="res/Leila-1929-600.jpeg"\>
+![GitHub Logo](res/Leila-1929-600.jpeg)
+Format: ![Alt Text](Leila)
+
 
 # docker.leila
 Docker container based on tensorflow/tensorflow:latest-gpu-jupyter.
