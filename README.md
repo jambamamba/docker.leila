@@ -65,6 +65,6 @@ Then logout, and login again.
 
 If you cannot run GUI apps inside the Docker container, like gedit, then from host you may need to grant X-server permission so your Docker container GUI app can run:
 
-``bash
+```bash
 xhost +
 ```
