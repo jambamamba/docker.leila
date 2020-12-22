@@ -1,5 +1,4 @@
 ![GitHub Logo](res/Leila-1929-600.jpeg)
-Format: ![Alt Text](Leila)
 
 
 # docker.leila
