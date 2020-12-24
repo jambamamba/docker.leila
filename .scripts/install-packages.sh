@@ -42,6 +42,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  gperf\
  help2man\
  htop\
+ imagemagick-6.q16\
  inetutils-ping\
  intltool\
  jq\
