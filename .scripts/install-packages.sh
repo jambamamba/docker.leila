@@ -129,6 +129,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --ignore-missing  -y \
  php7.2-xml\
  php7.2-zip\
  php-pear\
+ pixz\
  pkg-config\
  protobuf-compiler\
  python3\

@@ -107,7 +107,8 @@ function makeLib()
 		$(find . -name "lib*.so*" | xargs cp -Pt $BUILD_DIR/) && true
 		popd
 	else
-		CONF_FLAGS="${CONF_FLAGS//#/ }" #replace all # signs with spaces
+		CONF_FLAGS="${CONF_FLAGS//#space#/ }" #replace all #space# with spaces
+		CONF_FLAGS="${CONF_FLAGS//#equal#/=}" #replace all #equal#  with =
 		CFLAGS=$CFLAGS ./configure $CONF_FLAGS
 		make -j$(getconf _NPROCESSORS_ONLN)
 		find . -name "lib*.so*" | xargs cp -Pt $BUILD_DIR/

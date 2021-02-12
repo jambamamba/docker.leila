@@ -1,5 +1,5 @@
-#!/bin/bash -e
-set -e
+#!/bin/bash -ex
+set -ex
 #example usage, if input files are 01.png, 02.png, ... 99.png
 #~/imagestomp4.sh /home/oosman/projects/SmartBikeHelmet/15/a %02d.png
 
@@ -22,7 +22,9 @@ function ffimagesToVideo()
 	pushd $INPUT_FILE_PATH
 	rm -f out.mp4
 	VFRAMES=$(ls -1 *.png|wc -l)
-	$FFMPEG -start_number $START_FRAME  -framerate $INPUT_FRAME_RATE -r $OUTPUT_FRAME_RATE -i $INPUT_FILE_PATH/$INPUT_FILE_GLOB -c:v libx264 -vf fps=30 -b 8M -pix_fmt yuv420p -crf $QUALITY out.mp4
+	#crf means constant rate factor  https://superuser.com/questions/677576/what-is-crf-used-for-in-ffmpeg
+	#crf is a x264 option
+	$FFMPEG -start_number $START_FRAME  -framerate $INPUT_FRAME_RATE -r $OUTPUT_FRAME_RATE -i $INPUT_FILE_PATH/$INPUT_FILE_GLOB -c:v libx264 -vf fps=30 -b:v 8M -pix_fmt yuv420p -crf $QUALITY out.mp4
 	popd
 }
 
@@ -167,7 +169,7 @@ function ffhelp()
 #INPUT_FILE_GLOB=$2
 #export LD_LIBRARY_PATH=/opt/bf-booby-screen-recorder/gpl
 #FFMPEG=/opt/bf-booby-screen-recorder/gpl/ffmpeg
-FFMPEG=~/$DOCKERUSER/.libs/ffmpeg/ffmpeg
+FFMPEG=/home/dev/oosman/.leila/lib/ffmpeg/ffmpeg
 START_FRAME=0
 #END_FRAME=
 #-vframes=$END_FRAME
@@ -177,14 +179,24 @@ QUALITY=25
 
 parseArgs $@
 
-if [ "$fn"="" ]; then
+if [ "$fn" == "" ]; then
 	ffhelp
 	exit 0
+fi
+
+if [ ! -f $HOME/bin/ffmpeg ]; then
+	pushd /tmp
+		wget https://raw.githubusercontent.com/jambamamba/SquiggleMark/main/builddeps.sh
+		chmod +x builddeps.sh
+		./builddeps.sh
+	popd
 fi
 
 ff$fn
 
 #imagesToVideo INPUT_FILE_PATH=$INPUT_FILE_PATH FFMPEG=$FFMPEG START_FRAME=$START_FRAME INPUT_FRAME_RATE=$INPUT_FRAME_RATE OUTPUT_FRAME_RATE=$OUTPUT_FRAME_RATE INPUT_FILE_PATH=$INPUT_FILE_PATH INPUT_FILE_GLOB=$INPUT_FILE_GLOB QUALITY=$QUALITY
+#example:
+#./ff.sh fn=imagesToVideo INPUT_FILE_PATH=/home/dev/oosman/Documents/NuGen/4x-cars-crossing/a START_FRAME=1 INPUT_FRAME_RATE=30 INPUT_FILE_GLOB=%02d.png OUTPUT_FRAME_RATE=5
 
 #videoToImages INPUT_FILE_PATH=$INPUT_FILE_PATH OUTPUT_FRAME_RATE=$OUTPUT_FRAME_RATE
 #extractAudio INPUT_FILE_PATH=$INPUT_FILE_PATH
