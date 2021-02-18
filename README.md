@@ -12,24 +12,34 @@ lspci | grep VGA
 ```
 It should read something like this "NVIDIA Corporation GP104 [GeForce GTX 1080] (rev a1)"
 
-## Get the files, build the Docker image, then start the Docker container:
+### Prerequisites
+
+You are on Ubuntu and have git and Docker installed, otherwise do this:
+```bash
+sudo apt install -y git
+git config --global user.name "${USER}"
+git config --global user.email johndoe@example.com
+sudo apt  install -y docker.io
+```
+
+## Building the Docker image
 ```bash
 git clone https://github.com/jambamamba/docker.leila.git
 cd docker.leila
 ./build.sh
+```
+
+## Running the Docker container
+```bash
 ./enterdocker.sh
 ```
+
 When it asks for password when you run enterdocker.sh script, the password is:
 ```bash
 dev
 ```
 
-## Building the Docker image
-```bash
-./build.sh
-```
-
-### More commands
+### Some commands
 ```bash
 ./build.sh clean #this will purge all docker images from your system, not just docker.leila!
 ./build.sh base  #just build the first layer (that installs Ubuntu packages)
@@ -37,12 +47,7 @@ dev
 ./build.sh       #builds base layer if missing, then builds final layer on top, otherwise just builds final layer 
 ```
 
-## Entering the Docker container
-```bash
-./enterdocker.sh
-```
-
-## Exiting the container
+## Exiting a running container
 ```bash
 exit 
 ```
@@ -53,13 +58,14 @@ exit
 ./attachdocker.sh
 ```
 
-## Permission error when entering container
+## Permission error resolution
 
 If you get permission error
 
 ```bash
 sudo groupadd docker
 sudo usermod -aG docker ${USER}
+sudo chmod 666 /var/run/docker.sock
 ```
 
 Then logout, and login again.

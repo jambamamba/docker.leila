@@ -24,7 +24,7 @@ function configureGit()
 	   echo "setting git user as $GITUSER"
 	   git config --global user.name "$GITUSER"
 	fi
-	if [ "$GITEMAIL" = "" ]; then echo "Environment variable GITUSER was not set during docker run command. $GITUSER"; exit -1; else
+	if [ "$GITEMAIL" = "" ]; then echo "Environment variable GITUSER was not set during docker run command. $GITEMAIL"; exit -1; else
 	   echo "setting git email as $GITEMAIL"
 	   git config --global user.email "$GITEMAIL"
 	fi
