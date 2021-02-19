@@ -72,6 +72,12 @@ function configureApache2()
 function configureQtCreator()
 {
 	local SCRIPTS_DIR="/home/dev/.scripts"
+	if [ ! -d "/home/dev/$DOCKERUSER/Qt/5" ]; then
+		echo "Skipping Qt"
+		return 0
+	fi
+
+	export QTDIR=/home/dev/$DOCKERUSER/Qt/5
 	sudo cp $SCRIPTS_DIR/qtcreator.sh /usr/local/bin/qtcreator
 	sudo rm -fr /home/dev/.config
 	sudo ln -s /home/dev/$DOCKERUSER/.config /home/dev/.config
