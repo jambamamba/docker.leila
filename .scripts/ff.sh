@@ -95,6 +95,28 @@ function ffrotateVideo()
 	popd
 }
 
+function ffscaleVideoToWidth()
+{
+	parseArgs $1
+	INPUT_DIR=$(dirname $INPUT_FILE_PATH)
+	FILE_NAME=$(basename $INPUT_FILE_PATH)
+	pushd $INPUT_DIR
+	rm -f $INPUT_DIR/$FILE_NAME.out.mp4
+	$FFMPEG -i $INPUT_FILE_PATH -filter:v scale=$NEW_WIDTH:-1 -c:a copy $INPUT_DIR/$FILE_NAME.scaled.mp4
+	popd
+}
+
+function ffscaleVideoToHeight()
+{
+	parseArgs $1
+	INPUT_DIR=$(dirname $INPUT_FILE_PATH)
+	FILE_NAME=$(basename $INPUT_FILE_PATH)
+	pushd $INPUT_DIR
+	rm -f $INPUT_DIR/$FILE_NAME.out.mp4
+	$FFMPEG -i $INPUT_FILE_PATH -filter:v scale=-1:$NEW_HEIGHT -c:a copy $INPUT_DIR/$FILE_NAME.scaled.mp4
+	popd
+}
+
 function ffmetadata()
 {
 	parseArgs $1
@@ -161,6 +183,8 @@ function ffhelp()
 	echo "	ff.sh fn=extractAudio INPUT_FILE_PATH=x"
 	echo "	ff.sh fn=videoToImages INPUT_FILE_PATH=x OUTPUT_FRAME_RATE=x"
 	echo "	ff.sh fn=imagesToVideo INPUT_FILE_PATH=x INPUT_FILE_GLOB=x START_FRAME=x INPUT_FRAME_RATE=x OUTPUT_FRAME_RATE=x"
+	echo "	ff.sh fn=scaleVideoToWidth INPUT_FILE_PATH=x NEW_WIDTH=720"
+	echo "	ff.sh fn=scaleVideoToHeight INPUT_FILE_PATH=x NEW_HEIGHT=640"
 }
 
 
@@ -215,3 +239,8 @@ ff$fn
 #overlayImage "INPUT_FILE_PATH=$INPUT_FILE_PATH INPUT_IMAGE_PATH=$2"
 
 #reencode INPUT_FILE_PATH=$INPUT_FILE_PATH
+
+#scaleVideoToWidth INPUT_FILE_PATH=$INPUT_FILE_PATH NEW_WIDTH=720
+#scaleVideoToHeight INPUT_FILE_PATH=$INPUT_FILE_PATH NEW_Height=640
+
+
